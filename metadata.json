@@ -1,0 +1,6 @@
+{
+  "name": "Ethiopian Gems",
+  "description": "Luxury gemstone & jewelry boutique in Badi Chaupar, Jaipur, specializing in natural Ethiopian Opals, fine gemstones, and bespoke custom jewelry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
