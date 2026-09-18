@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ethiopiangemsjaipur.com'),
   title: 'Ethiopian Gems | Natural Ethiopian Opals & Fine Gemstones | Jaipur, India',
   description:
     'Ethiopian Gems is a luxury gemstone & jewelry house in Badi Chaupar, Jaipur, India. Direct purveyor of natural Ethiopian Welo Opals, Emeralds, Rubies, and bespoke handcrafted jewelry.',
@@ -16,19 +17,39 @@ export const metadata: Metadata = {
     'Certified Emerald Ruby Sapphire',
   ],
   authors: [{ name: 'Ethiopian Gems Jaipur' }],
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/favicon.svg',
+  },
+  alternates: {
+    canonical: 'https://ethiopiangemsjaipur.com',
+  },
   openGraph: {
     title: 'Ethiopian Gems | Natural Ethiopian Opals & Fine Gemstones | Jaipur',
     description:
       'Discover rare Ethiopian Opals with vibrant fire, fine emeralds, rubies, and handcrafted fine jewelry from the heart of Jaipur’s historic Badi Chaupar gem bazaar.',
+    url: 'https://ethiopiangemsjaipur.com',
     type: 'website',
     locale: 'en_IN',
     siteName: 'Ethiopian Gems',
+    images: [
+      {
+        url: '/images/gems/welo-opal.jpg',
+        width: 1200,
+        height: 800,
+        alt: 'Natural Ethiopian Welo Fire Opal Cabochon',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Ethiopian Gems | Fine Gemstones & Ethiopian Opals Jaipur',
     description:
       'Direct sourcing of rare Ethiopian Opals, precious stones, and bespoke jewelry from Jaipur, India.',
+    images: ['/images/gems/welo-opal.jpg'],
   },
 };
 

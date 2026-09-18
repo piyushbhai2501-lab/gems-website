@@ -79,6 +79,8 @@ export default function HomePage() {
     message: '',
   });
   const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactFeedback, setContactFeedback] = useState<string | null>(null);
 
   // Testimonial carousel active index
   const [activeReviewIdx, setActiveReviewIdx] = useState(0);
@@ -115,9 +117,26 @@ export default function HomePage() {
     setConsultationOpen(true);
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setContactSubmitted(true);
+    setContactSubmitting(true);
+    setContactFeedback(null);
+    try {
+      const res = await fetch('./contact.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      });
+      const data = await res.json().catch(() => null);
+      if (data && data.message) {
+        setContactFeedback(data.message);
+      }
+    } catch {
+      // Fallback gracefully on static or offline previews
+    } finally {
+      setContactSubmitting(false);
+      setContactSubmitted(true);
+    }
   };
 
   const handleWhatsAppContact = () => {
@@ -1481,7 +1500,7 @@ export default function HomePage() {
                         Message Sent Successfully
                       </h4>
                       <p className="text-xs text-[#FAF6EE]/80">
-                        Thank you, {contactForm.name}. We have received your inquiry regarding {contactForm.gemstone}. We will contact you at {contactForm.phone}.
+                        {contactFeedback || `Thank you, ${contactForm.name}. We have received your inquiry regarding ${contactForm.gemstone}. We will contact you at ${contactForm.phone}.`}
                       </p>
                       <button
                         id="contact-whatsapp-followup"
@@ -1493,7 +1512,10 @@ export default function HomePage() {
                       </button>
                     </div>
                   ) : (
-                    <form onSubmit={handleContactSubmit} className="space-y-4 text-xs">
+                    <form action="./contact.php" method="POST" onSubmit={handleContactSubmit} className="space-y-4 text-xs">
+                      {/* Anti-spam honeypot */}
+                      <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
+
                       <div>
                         <label className="block text-[#FAF6EE]/80 mb-1 font-medium">Your Name *</label>
                         <input
@@ -1566,10 +1588,20 @@ export default function HomePage() {
                         <button
                           type="submit"
                           id="contact-form-submit"
-                          className="flex-1 py-3 bg-gradient-to-r from-[#F4E297] via-[#D4AF37] to-[#C9A227] text-[#07261D] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:scale-[1.02] transition-transform flex items-center justify-center gap-1.5"
+                          disabled={contactSubmitting}
+                          className="flex-1 py-3 bg-gradient-to-r from-[#F4E297] via-[#D4AF37] to-[#C9A227] text-[#07261D] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:scale-[1.02] transition-transform flex items-center justify-center gap-1.5 disabled:opacity-60"
                         >
-                          <Send className="w-3.5 h-3.5" />
-                          Submit Inquiry
+                          {contactSubmitting ? (
+                            <>
+                              <div className="w-3.5 h-3.5 border-2 border-[#07261D] border-t-transparent rounded-full animate-spin" />
+                              Transmitting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3.5 h-3.5" />
+                              Submit Inquiry
+                            </>
+                          )}
                         </button>
                         <button
                           type="button"

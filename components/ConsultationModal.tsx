@@ -26,12 +26,28 @@ export default function ConsultationModal({
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      await fetch('./contact.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          type: 'Consultation Booking',
+        }),
+      });
+    } catch {
+      // Fallback gracefully
+    } finally {
+      setIsSubmitting(false);
+      setSubmitted(true);
+    }
   };
 
   const handleWhatsAppBooking = () => {
@@ -94,7 +110,10 @@ export default function ConsultationModal({
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+            <form action="./contact.php" method="POST" onSubmit={handleSubmit} className="space-y-4 text-xs">
+              {/* Anti-spam honeypot */}
+              <input type="text" name="honeypot" className="hidden" tabIndex={-1} autoComplete="off" />
+
               {/* Type Selection */}
               <div>
                 <label className="block font-semibold text-[#D4AF37] uppercase tracking-wider mb-2">
@@ -227,10 +246,20 @@ export default function ConsultationModal({
                 <button
                   type="submit"
                   id="consult-submit-btn"
-                  className="w-full py-3.5 bg-gradient-to-r from-[#F4E297] via-[#D4AF37] to-[#C9A227] text-[#07261D] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-gradient-to-r from-[#F4E297] via-[#D4AF37] to-[#C9A227] text-[#07261D] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Confirm Private Appointment Request
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[#07261D] border-t-transparent rounded-full animate-spin" />
+                      Sending Inquiry to Atelier...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Confirm Private Appointment Request
+                    </>
+                  )}
                 </button>
               </div>
             </form>
